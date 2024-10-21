@@ -29,6 +29,7 @@ from contextlib import closing
 from functools import partial
 from operator import itemgetter
 from zipfile import ZipFile
+import defusedxml.ElementTree
 
 if sys.version_info.major == 2:
     from urllib2 import urlopen
@@ -49,7 +50,6 @@ def read_supplemental_data(core_file):
         - variantMappings: mappings from variant subtags to preferred subtags
         Returns these mappings as dictionaries.
     """
-    import xml.etree.ElementTree as ET
 
     # From Unicode BCP 47 locale identifier <https://unicode.org/reports/tr35/>.
     re_unicode_language_id = re.compile(
@@ -169,7 +169,7 @@ def read_supplemental_data(core_file):
                 script.title() if script else None,
                 region.upper() if region else None)
 
-    tree = ET.parse(core_file.open("common/supplemental/supplementalMetadata.xml"))
+    tree = defusedxml.ElementTree.parse(core_file.open("common/supplemental/supplementalMetadata.xml"))
 
     for language_alias in tree.iterfind(".//languageAlias"):
         type = bcp47_id(language_alias.get("type"))
@@ -250,7 +250,7 @@ def read_supplemental_data(core_file):
                    "{} invalid variant subtag replacement".format(replacement))
             variant_mappings[type] = ("variant", replacement.lower())
 
-    tree = ET.parse(core_file.open("common/supplemental/likelySubtags.xml"))
+    tree = defusedxml.ElementTree.parse(core_file.open("common/supplemental/likelySubtags.xml"))
 
     likely_subtags = {}
 
@@ -321,7 +321,6 @@ def read_supplemental_data(core_file):
 
 
 def read_unicode_extensions(core_file):
-    import xml.etree.ElementTree as ET
 
     # Match all xml-files in the BCP 47 directory.
     bcp_file_re = re.compile(r"^common/bcp47/.+\.xml$")
@@ -342,7 +341,7 @@ def read_unicode_extensions(core_file):
     }
 
     def read_bcp47_file(file):
-        tree = ET.parse(file)
+        tree = defusedxml.ElementTree.parse(file)
         for keyword in tree.iterfind(".//keyword/key"):
             extension = keyword.get("extension", "u")
             assert extension == "u" or extension == "t", (
@@ -437,7 +436,7 @@ def read_unicode_extensions(core_file):
         # Replace aliases in special key values:
         #   - If there is an 'sd' or 'rg' key, replace any subdivision alias
         #     in its value in the same way, using subdivisionAlias data.
-        tree = ET.parse(file)
+        tree = defusedxml.ElementTree.parse(file)
         for alias in tree.iterfind(".//subdivisionAlias"):
             type = alias.get("type")
             assert type_re.match(type) is not None, (
