@@ -3,6 +3,7 @@
 # This code is governed by the BSD license found in the LICENSE file.
 
 import shutil, subprocess, sys, os, unittest, tempfile
+from security import safe_command
 
 testDir = os.path.dirname(os.path.abspath(__file__))
 OUT_DIR = os.path.join(testDir, 'out')
@@ -19,7 +20,7 @@ class TestLinter(unittest.TestCase):
 
     def lint(self, args):
         args[:0] = [sys.executable, ex]
-        sp = subprocess.Popen(args,
+        sp = safe_command.run(subprocess.Popen, args,
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE,
                               cwd=os.path.join(testDir, 'fixtures')

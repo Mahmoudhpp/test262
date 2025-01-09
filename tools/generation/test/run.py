@@ -3,6 +3,7 @@
 # This code is governed by the BSD license found in the LICENSE file.
 
 import shutil, subprocess, sys, os, unittest
+from security import safe_command
 
 testDir = os.path.dirname(os.path.relpath(__file__))
 OUT_DIR = os.path.join(testDir, 'out')
@@ -14,8 +15,7 @@ class TestGeneration(unittest.TestCase):
 
     def fixture(self, name):
         relpath = os.path.relpath(os.path.join(testDir, 'fixtures', name))
-        sp = subprocess.Popen(
-            [ex, 'create', '-o', OUT_DIR, '-p', relpath],
+        sp = safe_command.run(subprocess.Popen, [ex, 'create', '-o', OUT_DIR, '-p', relpath],
             stdout=subprocess.PIPE)
         stdout, stderr = sp.communicate()
         return dict(stdout=stdout, stderr=stderr, returncode=sp.returncode)
