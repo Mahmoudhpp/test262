@@ -58,7 +58,7 @@ class TestYAMLParsing(unittest.TestCase):
         name = 'fixtures/test262-yaml-headers.js'
         contents = slurpFile(name)
         (_, text) = findAttrs(contents)
-        parsed = yaml.load(text)
+        parsed = yaml.load(text, Loader=yaml.SafeLoader)
 
         self.assertEqual("Trying to declare function at the Block statement",
                          parsed['description'])
