@@ -4,6 +4,7 @@
 
 from __future__ import print_function
 import os, shutil, subprocess, sys
+from security import safe_command
 
 OUT_DIR = os.environ.get('OUT_DIR') or 'test'
 SRC_DIR = os.environ.get('SRC_DIR') or 'src'
@@ -11,7 +12,7 @@ UPSTREAM = os.environ.get('UPSTREAM') or 'git@github.com:tc39/test262.git'
 MAINTAINER = os.environ.get('MAINTAINER') or 'test262@ecma-international.org'
 
 def shell(*args):
-    sp = subprocess.Popen(list(args), stdout=subprocess.PIPE, universal_newlines=True)
+    sp = safe_command.run(subprocess.Popen, list(args), stdout=subprocess.PIPE, universal_newlines=True)
     cmd_str = ' '.join(args)
 
     print('> ' + cmd_str)
