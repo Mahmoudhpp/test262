@@ -1,1 +1,2 @@
 PyYAML==5.1.2
+defusedxml==0.7.1
